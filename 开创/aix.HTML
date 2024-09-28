@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态爱心</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #fcb69f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .heart {
+            font-size: 100px;
+            color: red;
+            animation: pulse 1s infinite;
+            cursor: pointer;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .falling-item {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="heart">❤️</div>
+    <script>
+        const heart = document.querySelector('.heart');
+        const colors = ['red', 'pink', 'purple', 'orange', 'blue', 'green', 'yellow'];
+        const items = ['❤️', '💖', '💗', '💓', '💘', '余', '卫', '萍'];
+        let clickCount = 0;
+
+        heart.addEventListener('click', (event) => {
+            clickCount++;
+            
+            heart.style.animation = 'none';
+            setTimeout(() => {
+                heart.style.animation = '';
+            }, 10);
+
+            const numItems = clickCount === 9 ? 50 : 10;
+            for (let i = 0; i < numItems; i++) {
+                createFallingItem(event.clientX, event.clientY);
+            }
+
+            if (clickCount === 9) {
+                clickCount = 0;
+            }
+        });
+
+        function createFallingItem(x, y) {
+            const item = document.createElement('div');
+            item.classList.add('falling-item');
+            item.textContent = items[Math.floor(Math.random() * items.length)];
+            item.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 300 + 100;
+            const startX = x;
+            const startY = y;
+            const endX = startX + Math.cos(angle) * distance;
+            const endY = startY + Math.sin(angle) * distance;
+
+            item.style.left = `${startX}px`;
+            item.style.top = `${startY}px`;
+            document.body.appendChild(item);
+
+            const animation = item.animate([
+                { transform: `translate(0, 0) scale(1) rotate(0deg)` },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0) rotate(360deg)` }
+            ], {
+                duration: 2000,
+                easing: 'ease-out'
+            });
+
+            animation.onfinish = () => item.remove();
+        }
+    </script>
+</body>
+</html>
